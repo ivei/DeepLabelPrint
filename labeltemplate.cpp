@@ -222,12 +222,18 @@ void drawLabel(const QRect &drawRect, int dpi, QPainter *painter, const LabelTem
             painter->drawText(elemRect, elem.hAlign|elem.vAlign, elem.value.value<QString>());
             break;
         case LabelTemplate::ElementType::ICON:
-            if( elem.value.canConvert<QPixmap>()){
-                painter->drawPixmap(elemRect, elem.value.value<QPixmap>().scaled(elemRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            {
+            auto ba = QByteArray::fromBase64(elem.value.toString().toLatin1());
+            QPixmap pixmap ;
+            pixmap.loadFromData(ba);
+            if( !pixmap.isNull()){
+                painter->drawPixmap(elemRect, pixmap.scaled(elemRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
             }
             else {
                 TRACE() << "Invalid icon format!";
             }
+            }
+
             break;
         case LabelTemplate::ElementType::LINE:
             painter->setPen(QPen(Qt::black, elem.lineWidth));

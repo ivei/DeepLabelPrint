@@ -12,31 +12,31 @@ const int PageHeight = 20;
 const int LabelWidth = 25;
 const int LabelHeight = 20;
 
+/**
+ * @brief 构造一个有一个二维码和一个二维码文本的标签, 带一条分割线.
+ * @details
+ *
+ */
 LabelTemplate test_make_template_01()
 {
-    QString filename = QString("D:\\workspace\\DeepLabelPrint\\icon.ico");
-    QPixmap pixmap;
-    pixmap.load(filename);
+    //QString filename = QString("D:\\workspace\\DeepLabelPrint\\icon.ico");
+    //QPixmap pixmap;
+    //pixmap.load(filename);
 
     LabelTemplate   tmpl;
-    tmpl.name   = "tp1";
+    tmpl.name   = "template_001";
     tmpl.size   = QSize(LabelWidth,LabelHeight);
 
-    LabelTemplate::Element elm1 = buildQRCodeElement(QRect(0,0,16,16), 1, 1);
-    //setElement(elm1, "JY20201013001B");
+    // 二维码大小为18x18
+    LabelTemplate::Element elm1 = buildQRCodeElement(QRect(0,0,13,13), 1, 1);
+
     tmpl.elements.push_back(elm1);
 
-    LabelTemplate::Element elm2 = buildTextElement(QRect(0,16,15,4), "天津金域", 5);
+    LabelTemplate::Element elm2 = buildTextElement(QRect(0,15,15,4), "TJJY", 5);
     tmpl.elements.push_back(elm2);
 
-    LabelTemplate::Element elm3 = buildLineElement(QLine(16, 0, 16, 20), 1);
+    LabelTemplate::Element elm3 = buildLineElement(QLine(15, 0, 15, 20), 1);
     tmpl.elements.push_back(elm3);
-
-    LabelTemplate::Element elm4 = buildIconElement(QRect(16, 0, 9, 9), pixmap, 0);
-    tmpl.elements.push_back(elm4);
-
-    LabelTemplate::Element elm5 = buildRectElement(QRect(18, 10, 6,6), 1);
-    tmpl.elements.push_back(elm5);
 
     return tmpl;
 }
@@ -84,52 +84,34 @@ void LabelPrint::printRequested(QPrinter* printer)
 
 void LabelPrint::on_btsTest1_clicked()
 {
-    LabelTemplate   tmpl;
 
 
-    tmpl = test_make_template_01();
+    this->curTmpl = test_make_template_01();
+
+    QString filename = QFileDialog::getSaveFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(), tr("json files (*.json)"));
+
+    //QString filename = QString("%1/%2.json").arg(QCoreApplication::applicationDirPath()).arg(tmpl.name);
 
 
-    QString filename = QString("%1/%2.json").arg(QCoreApplication::applicationDirPath()).arg(tmpl.name);
-    saveTemplate(tmpl, filename);
+
+    saveTemplate(this->curTmpl, filename);
 }
 
-void LabelPrint::on_btnTest2_clicked()
+
+
+
+
+void LabelPrint::on_loadTmplBtn_clicked()
 {
-    //QString filename = QString("%1/archive.json").arg(QCoreApplication::applicationDirPath());
     QString filename = QFileDialog::getOpenFileName(this, tr("选择文件"), QCoreApplication::applicationDirPath(), tr("json files (*.json)"));
 
     loadTemplate(this->curTmpl, filename);
 }
 
-void LabelPrint::on_testPrintBtn_clicked()
+void LabelPrint::on_prevPrintBtn_clicked()
 {
-
-#if 0
-    // 构造tp01,
-    LabelTemplate tmpl01 = test_make_template_01();
-
-
-    setElement(tmpl01.elements[1], "JY20201012001");
-    setElement(tmpl01.elements[0], "JY20201012001");
-    QPixmap pixmap(250, 200);
-    QPainter painter;
-    painter.begin(&pixmap);
-    painter.fillRect(pixmap.rect(), Qt::white);
-    drawLabel(pixmap.rect(), 203, &painter, tmpl01);
-    painter.end();
-
-    ui->dbgLabel->setPixmap(pixmap);
-#endif
-
     QPrinter printer;
-    printer.setOrientation(QPrinter::Portrait);
-    printer.setPageSize(QPageSize(QSizeF(PageWidth,PageHeight), QPageSize::Unit::Millimeter,"", QPageSize::ExactMatch));
-    printer.setFullPage(true);
-
     QPrintPreviewDialog dlg;
     connect(&dlg, &QPrintPreviewDialog::paintRequested, this, &LabelPrint::printRequested);
     dlg.exec();
-
-
 }

@@ -22,9 +22,9 @@ private slots:
 
     void on_btsTest1_clicked();
 
-    void on_btnTest2_clicked();
+    void on_loadTmplBtn_clicked();
 
-    void on_testPrintBtn_clicked();
+    void on_prevPrintBtn_clicked();
 
 private:
     Ui::LabelPrint *ui;
