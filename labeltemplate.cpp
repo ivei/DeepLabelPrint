@@ -158,7 +158,7 @@ void drawQRCode(const QRect &rect, QPainter *painter, const QString &str)
         TRACE() << "Invalid QRCode!";
         return;
     }
-    TRACE() << "Create QR Code with" << code->width;
+    //TRACE() << "Create QR Code with" << code->width;
     // 要计算放大倍数.
     int ratio = std::min(rect.width(), rect.height()) / code->width;
     int drawSize = code->width * ratio;
@@ -177,9 +177,10 @@ void drawQRCode(const QRect &rect, QPainter *painter, const QString &str)
         }
     }
     QRcode_free(code);
-
-    painter->setBrush(QBrush(Qt::black));
+    auto oldBrush = painter->brush();
+    painter->setBrush(QBrush(Qt::black, Qt::SolidPattern));
     painter->drawRects(rects);
+    painter->setBrush(oldBrush);
 
 }
 
@@ -202,7 +203,12 @@ void drawLabel(const QRect &drawRect, int dpi, QPainter *painter, const LabelTem
     // 计算放大倍数, 每毫米的像素数. 1inch=25.4mm
     double scale = dpi / 25.4;
     // 标签的绘制区域.
+    auto oldBrush = painter->brush();
+    auto oldPen = painter->pen();
+    auto oldFont = painter->font();
+
     QRect pixRect = QRect(drawRect.topLeft()*scale, drawRect.size()*scale);
+    painter->setBrush(QBrush(Qt::NoBrush));
     painter->drawRect(pixRect.adjusted(2,2,-2,-2));
     // 分别绘制每个element
     for(auto& elem: label.elements)
@@ -254,6 +260,9 @@ void drawLabel(const QRect &drawRect, int dpi, QPainter *painter, const LabelTem
             break;
         }
     }// -- end of for
+    painter->setFont(oldFont);
+    painter->setPen(oldPen);
+    painter->setBrush(oldBrush);
 }
 
 
